@@ -178,5 +178,36 @@ module Professor
       violations.length.should == 1
     end
 
+    it "creates a StyleViolation bad class names" do
+      file_name = make_file(<<-RUBY)
+        class BADCLASSNAME
+        end
+        # This is a false positive!
+        # class HTTPOkayClassName
+        # end
+        class URI
+        end
+        class bad_class_name
+        end
+      RUBY
+
+      violations = check(file_name).violations
+      violations.length.should == 2
+    end
+
+    it "creates a StyleViolation for bad method names" do
+      file_name = make_file(<<-RUBY)
+        def BAD_METHOD_NAME
+        end
+        def good_method_name
+        end
+        def BAD_method_name
+        end
+      RUBY
+
+      violations = check(file_name).violations
+      violations.length.should == 2
+    end
+
   end
 end
