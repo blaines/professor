@@ -99,7 +99,7 @@ module Professor
         class_names << matches[3] if matches[3]
         unless class_names.all? {|name| name[/(([A-Z][a-z0-9]+|::))+/] == name || !!ACCEPTABLE_CLASS_ACRONYMS.index(name)}
           result << "Use CamelCase for classes and modules. (Keep acronyms like HTTP, RFC, XML uppercase.)"
-          result << class_names.inspect
+          # result << class_names.inspect
         end
       end
       result
