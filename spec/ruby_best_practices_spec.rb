@@ -9,7 +9,7 @@ module Professor
       described_class.new(opts.merge(rbp_glob: file_name))
     end
 
-    it "creates a StyleViolation for each usage of puts or print" do
+    it "creates a violation for each usage of puts or print" do
       file_name = make_file(<<-RUBY)
       puts "test"
       print "testing"
@@ -23,7 +23,7 @@ module Professor
       violations.length.should == 2
     end
 
-    it "creates a StyleViolation for each usage of rescue Exception" do
+    it "creates a violation for each usage of rescue Exception" do
       file_name = make_file(<<-RUBY)
       begin
       rescue Exception => e
@@ -36,7 +36,7 @@ module Professor
       violations.length.should == 2
     end
 
-    it "creates a StyleViolation for each usage of class (@@) variables" do
+    it "creates a violation for each usage of class (@@) variables" do
       file_name = make_file(<<-RUBY)
       @@please_dont_do_this = true
       RUBY
@@ -45,7 +45,7 @@ module Professor
       violations.length.should == 1
     end
 
-    it "creates a StyleViolation for each usage of Rails.env" do
+    it "creates a violation for each usage of Rails.env" do
       file_name = make_file(<<-RUBY)
       Rails.env.development?
       Rails.env.test do
@@ -58,7 +58,7 @@ module Professor
       violations.length.should == 3
     end
 
-    it "creates a StyleViolation for each usage of sleep" do
+    it "creates a violation for each usage of sleep" do
       file_name = make_file(<<-RUBY)
       sleep(0x55444534)
       sleep 0x55444534
@@ -69,7 +69,7 @@ module Professor
       violations.length.should == 3
     end
 
-    it "creates a StyleViolation for each usage of debugger" do
+    it "creates a violation for each usage of debugger" do
       file_name = make_file(<<-RUBY)
       debugger
       hidden debugger inline
@@ -80,7 +80,7 @@ module Professor
       violations.length.should == 3
     end
 
-    it "creates a StyleViolation for using {...} for multi-line blocks" do
+    it "creates a violation for using {...} for multi-line blocks" do
       file_name = make_file(<<-RUBY)
       why_would_you {
         do_like_this?
@@ -104,7 +104,7 @@ module Professor
       violations.length.should == 2
     end
 
-    it "creates a StyleViolation for chaining do...end" do
+    it "creates a violation for chaining do...end" do
       file_name = make_file(<<-RUBY)
       dont do
         this
@@ -115,7 +115,7 @@ module Professor
       violations.length.should == 1
     end
 
-    it "creates a StyleViolation for lack of spaces around the = operator when assigning default values to method parameters" do
+    it "creates a violation for lack of spaces around the = operator when assigning default values to method parameters" do
       file_name = make_file(<<-RUBY)
       def method_name(and_arg=bad)
       end
@@ -125,7 +125,7 @@ module Professor
       violations.length.should == 1
     end
 
-    it "creates a StyleViolation for using ||= to initialize boolean variables" do
+    it "creates a violation for using ||= to initialize boolean variables" do
       file_name = make_file(<<-RUBY)
       this_wontwork = false
       this_wontwork ||= true
@@ -135,7 +135,7 @@ module Professor
       violations.length.should == 1
     end
 
-    it "creates a StyleViolation for using special variables (like $0-9, $, etc. )" do
+    it "creates a violation for using special variables (like $0-9, $, etc. )" do
       file_name = make_file(<<-RUBY)
       $!\n$"\n$$\n$&\n$&\n$'\n$'\n$*\n$+\n$+\n$,\n$-0\n$-a\n$-d\n$-F\n$-i\n$-I\n$-K\n$-l\n$-p\n$-v\n$-w\n$.\n$/\n$0\n$1\n$2\n$3\n$4\n$5\n$6\n$7\n$8\n$9\n$:\n$;\n$<\n$=\n$>\n$?\n$@\n$\\n$_\n$`
       $binding\n$DEBUG\n$deferr\n$defout\n$FILENAME\n$KCODE\n$LOAD_PATH\n$LOADED_FEATURES\n$PROGRAM_NAME\n$SAFE\n$stderr\n$stdin\n$stdout\n$VERBOSE\n$~
@@ -145,7 +145,7 @@ module Professor
       violations.length.should == 57
     end
 
-    it "creates a StyleViolation for nested ternary operators" do
+    it "creates a violation for nested ternary operators" do
       file_name = make_file(<<-RUBY)
       what ? does : this ? even : mean
       RUBY
@@ -154,7 +154,7 @@ module Professor
       violations.length.should == 1
     end
 
-    it "creates a StyleViolation for using then for multi-line if/unless" do
+    it "creates a violation for using then for multi-line if/unless" do
       file_name = make_file(<<-RUBY)
       if you_do_this then
         exit(1)
@@ -168,7 +168,7 @@ module Professor
       violations.length.should == 2
     end
 
-    it "creates a StyleViolation for methods defined without arguments with parentheses" do
+    it "creates a violation for methods defined without arguments with parentheses" do
       file_name = make_file(<<-RUBY)
         def bad_example()
         end
@@ -178,7 +178,7 @@ module Professor
       violations.length.should == 1
     end
 
-    it "creates a StyleViolation bad class names" do
+    it "creates a violation bad class names" do
       file_name = make_file(<<-RUBY)
         class BADCLASSNAME
         end
@@ -195,7 +195,7 @@ module Professor
       violations.length.should == 2
     end
 
-    it "creates a StyleViolation for bad method names" do
+    it "creates a violation for bad method names" do
       file_name = make_file(<<-RUBY)
         def BAD_METHOD_NAME
         end
