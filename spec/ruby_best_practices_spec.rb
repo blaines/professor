@@ -178,7 +178,7 @@ module Professor
       violations.length.should == 1
     end
 
-    it "creates a violation bad class names" do
+    xit "creates a violation bad class names" do
       file_name = make_file(<<-RUBY)
         class BADCLASSNAME
         end
