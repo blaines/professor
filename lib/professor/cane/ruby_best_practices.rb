@@ -60,7 +60,7 @@ module Professor
       begin
         result = []
         result += simple_violations(line)
-        result += violations_for_class_name(line)
+        # result += violations_for_class_name(line) # WIP
         result += violations_for_method_name(line)
       rescue => e
         puts "Error processing line: #{line}"
@@ -90,17 +90,24 @@ module Professor
       result
     end
 
+    # WIP
     def violations_for_class_name(line)
       # Break up each capitalized word
       result = []
-      if line =~ /^\s*class \w+/i
-        matches = line.match(/^\s*class\s([\w:]+)+(\s<\s([\w:]+)+)?/)
-        class_names ||= [matches[1]]
-        class_names << matches[3] if matches[3]
-        unless class_names.all? {|name| name[/(([A-Z][a-z0-9]+|::))+/] == name || !!ACCEPTABLE_CLASS_ACRONYMS.index(name)}
-          result << "Use CamelCase for classes and modules. (Keep acronyms like HTTP, RFC, XML uppercase.)"
-          # result << class_names.inspect
-        end
+      if line =~ /^\s*(class|module) \w+/i
+        matches = line.match(/^\s*(class|module)\s([\w]+)+(\s<\s([\w:]+)+)?/)
+        class_name = matches[2]
+        class_name_parts = class_name.split(/(?<!^|[A-Z])(?=[A-Z])|(?<!^)(?=[A-Z][a-z])/)
+        puts class_name_parts.inspect
+        # class_names ||= [matches[2]]
+        # class_names << matches[4] if matches[4]
+        # puts class_names.inspect
+        # class_names.each
+        # class_name_words = class_name.split(/(?<!^|[A-Z])(?=[A-Z])|(?<!^)(?=[A-Z][a-z])/)
+        # unless class_names.all? {|name| name[/(([A-Z][a-z0-9]+|::))+/] == name || !!ACCEPTABLE_CLASS_ACRONYMS.index(name)}
+        #   result << "Use CamelCase for classes and modules. (Keep acronyms like HTTP, RFC, XML uppercase.)"
+        #   result << class_names.inspect
+        # end
       end
       result
     end
