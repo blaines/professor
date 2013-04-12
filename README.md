@@ -4,8 +4,8 @@ Grades your changes based on best practices.
 
 ## Installation
 
-    git clone git@source.flexilis.local:bschanfeldt/Professor.git
-    cd Professor
+    git clone git@source.flexilis.local:gems/professor.git
+    cd professor
     gem build professor.gemspec; gem install professor-0.0.1.pre.gem
     professor help
 
