@@ -37,8 +37,9 @@ module Professor
     end
 
     desc "automate", "automate"
+    method_options :force => :boolean
     def automate
-      if yes?("This will install Professor to the global gemset and add a pre-commit hook, okay?".yellow)
+      if options.force? || yes?("This will install Professor to the global gemset and add a pre-commit hook, okay?".yellow)
         puts "*  RVM is installed".green if SystemHelper.show_exec("which rvm").exitstatus == 0
         rubies = SystemHelper.show_exec("rvm list strings").stdout
         selected_ruby ||= rubies[/1\.9\.3/]
