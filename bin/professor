@@ -1,5 +1,10 @@
 #!/usr/bin/env ruby
 
-require 'professor/cli'
+begin
+  require 'professor/cli'
+rescue LoadError
+  $:.unshift File.expand_path(File.dirname(__FILE__) + '/../lib/')
+  require 'professor/cli'
+end
 
 Professor::CLI.start
