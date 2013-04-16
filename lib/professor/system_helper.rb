@@ -3,11 +3,11 @@ require 'colorize'
 module Professor
   class SystemHelper
     class << self
-      def print_exec(cmd, color=:default)
+      def print_exec(cmd, color = :default)
         return show_exec(cmd, color).print(color)
       end
 
-      def show_exec(cmd, color=:default)
+      def show_exec(cmd, color = :default)
         unless color == :default
           puts cmd.send(color)
         else
@@ -30,7 +30,7 @@ module Professor
       self
     end
 
-    def print(color=:default)
+    def print(color = :default)
       unless color == :default
         puts @stdout.send(color)
       else
