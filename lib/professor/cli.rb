@@ -78,6 +78,14 @@ module Professor
       end
     end
 
+    desc "post-commit-plumbing", "post_commit_plumbing"
+    def post_commit_plumbing
+      unless grade
+        puts "Please fix the violations.".red
+        exit(1)
+      end
+    end
+
     desc "version", "version"
     def version
       puts Professor::VERSION
