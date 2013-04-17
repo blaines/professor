@@ -15,7 +15,7 @@ module Professor
     end
 
     desc "grade", "grade"
-    def grade(what_to_grade=nil)
+    def grade(what_to_grade = nil)
       case what_to_grade
       when /everything/i
         files_to_grade = grade_everything
