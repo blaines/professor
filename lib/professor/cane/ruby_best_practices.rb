@@ -82,7 +82,7 @@ module Professor
       result << "Use spaces around the = operator when assigning default values to method parameters"   if line =~ /def\s[^\s(]+(,?[\s(]\w+=[^,\s]+)+/i
       result << "Don't use ||= to initialize boolean variables"                                         if line =~ /\w+\s?\|\|\= true/i
       # result << "Never put a space between a method name and the opening parenthesis"                 if line =~ /^(?![^#]+(if|elsif|unless|=))[^#]+\s\([^)]+\)/i\
-      result << "Avoid using Perl-style special variables (like $0-9, $, etc. )"                        if line =~ /\$[\w\!\"\&\'\*\+\,\-\.\/\:\;\<\=\>\?\@\\\_\`\~]+/
+      result << "Avoid using Perl-style special variables (like $0-9, $, etc. )"                        if line =~ /^[^\/]*\$[\w\!\"\&\'\*\+\,\-\.\/\:\;\<\=\>\?\@\\\_\`\~]+/
       result << "Use one expression per branch and nested don't nest ternary operators"                 if line =~ /\s\?.+:\s.+\s\?.+:\s/i
       result << "Never use then for multi-line if/unless"                                               if line =~ /^[^#]*(if|unless)[\s\(]{1,2}[^\)\s]+[\)\s]{1,2}then/i
       # Use def with parentheses when there are arguments. Omit the parentheses when the method doesn't accept any arguments.

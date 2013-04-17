@@ -137,8 +137,11 @@ module Professor
 
     it "creates a violation for using special variables (like $0-9, $, etc. )" do
       file_name = make_file(<<-RUBY)
+      # True positives
       $!\n$"\n$$\n$&\n$&\n$'\n$'\n$*\n$+\n$+\n$,\n$-0\n$-a\n$-d\n$-F\n$-i\n$-I\n$-K\n$-l\n$-p\n$-v\n$-w\n$.\n$/\n$0\n$1\n$2\n$3\n$4\n$5\n$6\n$7\n$8\n$9\n$:\n$;\n$<\n$=\n$>\n$?\n$@\n$\\n$_\n$`
       $binding\n$DEBUG\n$deferr\n$defout\n$FILENAME\n$KCODE\n$LOAD_PATH\n$LOADED_FEATURES\n$PROGRAM_NAME\n$SAFE\n$stderr\n$stdin\n$stdout\n$VERBOSE\n$~
+      # False posiives
+      /\.some\.regex$/
       RUBY
 
       violations = check(file_name).violations
