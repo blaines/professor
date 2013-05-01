@@ -25,6 +25,8 @@ Gem::Specification.new do |gem|
   gem.has_rdoc      = false
   gem.add_dependency 'cane'
   gem.add_dependency 'thor'
+  gem.add_dependency 'git', '~> 1.2.5'
+  gem.add_dependency 'logger'
   gem.add_dependency 'colorize'
   gem.add_development_dependency 'rspec', '~> 2.0'
   gem.add_development_dependency 'rake'

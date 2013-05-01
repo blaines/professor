@@ -70,16 +70,46 @@ module Professor
       end
     end
 
-    desc "pre-commit-plumbing", "pre_commit_plumbing"
-    def pre_commit_plumbing
+    desc "schema-migration-plumbing", "schema_migration_plumbing"
+    method_option :verbose, :aliases => "-v", :desc => "Verbose, duh."
+    method_option :from, :aliases => "-f", :desc => "Starting commit to verify"
+    method_option :to, :aliases => "-t", :desc => "Last commit to verify"
+    method_option :cwd, :aliases => "-c", :desc => "Verify current working directory"
+    def schema_migration_plumbing
+      options[:delete]
+      start_cset = options[:from]
+      end_cset = options[:to]
+      working_dir = options[:cwd]
+
+      # Get start/end changesets from Jenkins job environment.
+      # Use Head/Parent-of-Head if Jenkins environment not found (for testing)
+      start_cset ||= ENV.has_key?("GIT_PREVIOUS_COMMIT") ? ENV["GIT_PREVIOUS_COMMIT"] : "HEAD^1"
+      end_cset ||= ENV.has_key?("GIT_CURRENT_COMMIT") ? ENV["GIT_CURRENT_COMMIT"] : "HEAD"
+      working_dir ||= Dir.pwd
+
+      if options[:verbose]
+        git = ::Git.open(working_dir, :log => Logger.new(STDOUT))
+      else
+        git = ::Git.open(working_dir)
+      end
+
+      check = Git::CommitCheckRange.new(git, start_cset, end_cset)
+
+      # Check for violations. Exit with 1 if violations are found.
+      result = check.has_migrations_without_schema_update?
+      exit(result ? 1 : 0)
+    end
+
+    desc "pre-commit", "pre_commit"
+    def pre_commit
       unless grade
         puts "Please fix the violations before committing.".red
         exit(1)
       end
     end
 
-    desc "post-commit-plumbing", "post_commit_plumbing"
-    def post_commit_plumbing
+    desc "post-commit", "post_commit"
+    def post_commit
       unless grade
         puts "Please fix the violations.".red
         exit(1)
