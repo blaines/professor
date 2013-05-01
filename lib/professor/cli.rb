@@ -7,15 +7,38 @@ module Professor
   class CLI < Thor
     include Thor::Actions
 
-    desc "help", "help"
-    def help
-      puts "# Professor"
-      puts "* grade [everything, changes, commit] - Default: grade changes or last commit"
-      puts "* automate - sets up professor to run automatically with a pre-commit hook"
-    end
+    default_task :grade
+
+    # desc "help", "help"
+    # def help
+    #   puts "# Professor"
+    #   puts "* grade [everything, changes, commit] - Default: grade changes or last commit"
+    #   puts "* automate - sets up professor to run automatically with a pre-commit hook"
+    # end
+    # git commit -a --amend
+    # git diff
+    # git merge
 
     desc "grade", "grade"
+    # ALL           ls files
+    # untracked     -
+    # unmodified    -
+    # modified      git diff
+    # staged        git diff --cached HEAD
+    # SHAs          git diff <commit> <commit>
+    # method_option :everything,  :aliases => "-a", :desc => "Checks the entire project"
+    # method_option :staged,      :aliases => "-m", :desc => "Checks staged changes"
+    # method_option :modified,    :aliases => "-s", :desc => "Checks all changes"
+    # method_option :staged,      :aliases => "-", :desc => "Checks staged changes"
+    # grade where
+    # check what where
+    # check-practices where
+    # check-schema where
+    # check-jira where
+    # check-tests
+    # Grade runs all checks
     def grade(what_to_grade = nil)
+      schema-migration-plumbing
       case what_to_grade
       when /everything/i
         files_to_grade = grade_everything
@@ -34,6 +57,15 @@ module Professor
         :rbp_glob=>files_to_grade
       }
       Cane.run(spec)
+    end
+
+    desc "check-practices", "check_practices"
+    def check_practices
+      @checks_to_run << RubyBestPractices
+    end
+
+    desc "check-schema", "check_schema"
+    def check_schema
     end
 
     desc "automate", "automate"
