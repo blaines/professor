@@ -40,7 +40,7 @@ module Professor
     end
 
     def run
-      @stdout = `#{@command}`
+      @stdout = `#{@command} 2>&1`
       @exitstatus = $?.exitstatus
       @process = $?
       self

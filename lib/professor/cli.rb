@@ -6,7 +6,13 @@ require 'cane'
 module Professor
   class CLI < Thor
     include Thor::Actions
+    class << self
 
+      def all_verifiers
+        self.instance_methods.map {|z| $1 if z[/check_(.+)/]}.compact!
+      end
+
+    end
     default_task :grade
 
     # desc "help", "help"
@@ -19,7 +25,6 @@ module Professor
     # git diff
     # git merge
 
-    desc "grade", "grade"
     # ALL           ls files
     # untracked     -
     # unmodified    -
@@ -37,38 +42,59 @@ module Professor
     # check-jira where
     # check-tests
     # Grade runs all checks
-    def grade(what_to_grade = nil)
-      schema-migration-plumbing
-      case what_to_grade
-      when /everything/i
-        files_to_grade = grade_everything
-      when /changes/i
-        files_to_grade = grade_changes
-      when /commit/i
-        files_to_grade = grade_commit
-      when nil
-        files_to_grade = grade_porcelain
-      end
+    # def grade(what_to_grade = nil)
+    #   schema-migration-plumbing
+    #   case what_to_grade
+    #   when /everything/i
+    #     files_to_grade = grade_everything
+    #   when /changes/i
+    #     files_to_grade = grade_changes
+    #   when /commit/i
+    #     files_to_grade = grade_commit
+    #   when nil
+    #     files_to_grade = grade_porcelain
+    #   end
+    # end
+
+    desc "check-style", "check_style"
+    def check_style(*args)
+      before_checks(args)
       spec = {
-        :max_violations=>0,
-        :parallel=>false,
-        :exclusions_file=>nil,
-        :checks=>[RubyBestPractices],
-        :rbp_glob=>files_to_grade
+        :max_violations   => 0,
+        :parallel         => false,
+        :exclusions_file  => nil,
+        :checks           => [RubyBestPractices],
+        :rbp_glob         => @@selected_files
       }
       Cane.run(spec)
+      invoke :exec_checks, args
     end
-
-    desc "check-practices", "check_practices"
-    def check_practices
-      @checks_to_run << RubyBestPractices
-    end
+    map :practices => :check_style
 
     desc "check-schema", "check_schema"
-    def check_schema
+    def check_schema(*args)
+      before_checks(args)
+      schema_migration_plumbing
+      invoke :exec_checks, args
     end
 
-    desc "automate", "automate"
+    desc "grade [<command>...] [<commit>]", ["Verify all changes since <commit> using <command>",
+      "Possible options are: #{(self.all_verifiers).join(",\s")}"].join("\n")
+    def grade(*args)
+      before_checks(args)
+      args = self.all_verifiers if args.empty?
+      invoke :exec_checks, args
+    end
+    map :check => :grade
+
+    desc "exec-checks", "exec_checks"
+    def exec_checks(*args)
+      args.each do |arg|
+        invoke "check_#{arg}".intern
+      end
+    end
+
+    desc "automate", "Adds a git pre-commit hook to automatically verify changes"
     method_options :force => :boolean
     def automate
       if options.force? || yes?("This will install Professor to the global gemset and add a pre-commit hook, okay?".yellow)
@@ -154,6 +180,63 @@ module Professor
     end
 
     no_tasks do
+      def before_checks(args)
+        # has_git?
+        process_what_to_grade(args)
+        # z = self.class.instance_methods.map {|z| $1 if z[/check_(.+)/]}.compact!
+        # args.each do |arg|
+        #   puts "No check found for #{arg}!"
+        # end
+        # puts z.inspect
+      end
+
+      # We need to figure out how to seperate actions from git revs
+      def process_what_to_grade(args)
+        return @@selected_files if defined? @@selected_files
+        # Probably a bad way to get two possible revs, say to compare <from rev> <to rev>
+        # possible_revs = []
+        # if possible_revs[0] = args[-2]
+        #   possible_revs[1] = args[-1]
+        # else
+        #   possible_revs[0] ||= args[-1]
+        # end
+        #
+        # Verify each are valid git revs
+        # possible_revs.map! do |opt|
+        #   begin
+        #     SystemHelper.exec("git rev-parse #{opt}")
+        #     opt
+        #   rescue
+        #     puts "#{opt} is not a ref"
+        #   end
+        # end
+        #
+        # possible_revs.compact!
+
+        rev = args.last
+        if valid_rev?(rev)
+          @@rev = rev
+          args.pop
+        end
+        @@rev ||= "HEAD"
+        @@selected_files ||= git_diff_index(@@rev)
+        @@selected_files
+      end
+
+      def valid_rev?(rev)
+        begin
+          SystemHelper.exec("git rev-parse #{rev}")
+          return true
+        rescue
+          return false
+        end
+      end
+
+      def git_diff_index(rev)
+        changed_files = SystemHelper.show_exec("git diff-index --name-only #{rev}").stdout
+        changed_files.split.reject {|s| !(s =~ /\.rb/)}
+      end
+
       def grade_everything
         files_to_grade ||= "{app,lib}/**/*.rb"
       end
