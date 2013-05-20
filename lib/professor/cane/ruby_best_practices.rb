@@ -28,7 +28,7 @@ module Professor
 
       result = worker.map(file_list) do |file_path|
         problems = []
-        if file_path =~ /billing_mechanism(\.rb|_)/i
+        if file_path =~ /billing_mechanism(\.rb|_)/i && !(file_path =~ /^test/i)
           problems += map_lines(file_path) do |line, line_number|
             violations_for_billing_mechanisms(line.chomp).map do |message|
               {
@@ -82,7 +82,10 @@ module Professor
       result << "Use spaces around the = operator when assigning default values to method parameters"   if line =~ /def\s[^\s(]+(,?[\s(]\w+=[^,\s]+)+/i
       result << "Don't use ||= to initialize boolean variables"                                         if line =~ /\w+\s?\|\|\= true/i
       # result << "Never put a space between a method name and the opening parenthesis"                 if line =~ /^(?![^#]+(if|elsif|unless|=))[^#]+\s\([^)]+\)/i\
-      result << "Avoid using Perl-style special variables (like $0-9, $, etc. )"                        if line =~ /^[^\/]*\$[\w\!\"\&\'\*\+\,\-\.\/\:\;\<\=\>\?\@\\\_\`\~]+/
+
+      # This needs to be modified as there are sometimes no alternatives to special vars (ruby1.8/regex)
+      # result << "Avoid using Perl-style special variables (like $0-9, $, etc. )"                        if line =~ /^[^\/]*\$[\w\!\"\&\'\*\+\,\-\.\/\:\;\<\=\>\?\@\\\_\`\~]+/
+
       result << "Use one expression per branch and nested don't nest ternary operators"                 if line =~ /\s\?.+:\s.+\s\?.+:\s/i
       result << "Never use then for multi-line if/unless"                                               if line =~ /^[^#]*(if|unless)[\s\(]{1,2}[^\)\s]+[\)\s]{1,2}then/i
       # Use def with parentheses when there are arguments. Omit the parentheses when the method doesn't accept any arguments.
